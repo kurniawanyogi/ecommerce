@@ -1,0 +1,24 @@
+package com.ecommerce.auth_service.model.request;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
+
+@Getter
+@Setter
+@ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SaveRoleRequest {
+    @NotBlank(message = "name is required")
+    @Max(value = 100, message = "name must be less than 100 characters")
+    private String name;
+
+    @NotBlank(message = "description is required")
+    @Max(value = 255, message = "description must be less than 255 characters")
+    private String description;
+}

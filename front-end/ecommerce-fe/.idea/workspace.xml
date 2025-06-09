@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="13528ed3-e618-469e-b764-a3c5bf011c59" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../.idea/ecommerce.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/.idea/user-management-service.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/common/security/JwtAuthenticationFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/common/security/JwtUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/common/security/UserDetailsServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/model/request/CustomerUpdateRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/model/request/LoginRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/model/response/CustomerDetailResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/model/response/LoginResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../back-end/user-management-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/common/config/WebSecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/common/config/WebSecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/controller/CustomerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/controller/CustomerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/service/CustomerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/service/CustomerService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/service/impl/AuthServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/service/impl/AuthServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/service/impl/CustomerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../back-end/user-management-service/src/main/java/com/ecommerce/user_management_service/service/impl/CustomerServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../back-end/user-management-service/target/test-classes/com/ecommerce/user_management_service/UserManagementServiceApplicationTests.class" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2w8fLanZ9VbzV5ethpWeoxnxqXk" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven.web [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.web [install].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/kyl/yogi/project/fullstack/ecommerce/front-end/web&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="ecommerce-fe" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="ecommerce-fe" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="WebApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="web" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.ecommerce.web.WebApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.23774.435" />
+        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-IU-251.23774.435" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="13528ed3-e618-469e-b764-a3c5bf011c59" name="Changes" comment="" />
+      <created>1745428067109</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1745428067109</updated>
+      <workItem from="1745428068502" duration="428000" />
+      <workItem from="1745743110387" duration="60000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

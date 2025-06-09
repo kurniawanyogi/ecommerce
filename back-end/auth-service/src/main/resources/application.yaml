@@ -1,0 +1,59 @@
+server:
+  port: 8880
+
+spring:
+ application:
+  name: auth-service
+
+ datasource:
+   url: jdbc:postgresql://localhost:5432/auth_service
+   username: postgres
+   password: postgres
+   driver-class-name: org.postgresql.Driver
+
+ redis:
+  host: localhost
+  password: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+  port: 6379
+  timeout: 2000
+
+ jpa:
+   show-sql: true
+   hibernate:
+    ddl-auto: none
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+   properties:
+     hibernate:
+       dialect: org.hibernate.dialect.PostgreSQLDialect
+
+ kafka:
+   bootstrap-servers: localhost:9092
+   producer:
+     key-serializer: org.apache.kafka.common.serialization.StringSerializer
+     value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+     properties:
+       spring.json.add.type.headers: false
+   consumer:
+     group-id: user-management-service
+     auto-offset-reset: earliest
+     key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+     value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+     properties:
+       spring.json.trusted.packages: "*"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+info:
+  app:
+    name: auth-service
+    description: Service that handles authentication and authorization
+    version: @project.version@
+    build-time: @maven.build.timestamp@
+  environment: development
