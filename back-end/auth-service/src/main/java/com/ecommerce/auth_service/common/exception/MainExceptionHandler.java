@@ -25,6 +25,7 @@ public class MainExceptionHandler {
         response.setCode(exception.getCode());
         response.setMessage(exception.getMessage());
         response.setData(null);
+        response.setErrors(exception.getMessage());
         log.warn(String.format("validation code : %s , message : %s ", response.getCode(), response.getMessage()));
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -48,8 +49,6 @@ public class MainExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-
-        log.warn(String.format("400-VALIDATION : %s ", errors));
 
         return new ResponseEntity<>(new BaseResponse(GeneralError.VALIDATION_ERROR.getCode(), null, null, errors), HttpStatus.BAD_REQUEST);
     }
