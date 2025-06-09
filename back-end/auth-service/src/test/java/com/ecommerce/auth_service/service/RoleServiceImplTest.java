@@ -38,7 +38,7 @@ public class RoleServiceImplTest {
         verify(roleRepository).save(argThat(role ->
                 role.getName().equals("admin") &&
                         role.getDescription().equals("admin role") &&
-                        role.getStatus().equals("ACTIVE")
+                        role.getStatus().equals(GeneralStatus.ACTIVE.getValue())
         ));
     }
 
@@ -71,10 +71,10 @@ public class RoleServiceImplTest {
                 .id(roleId)
                 .name("old-admin")
                 .description("old desc")
-                .status("ACTIVE")
+                .status(GeneralStatus.ACTIVE.getValue())
                 .build();
 
-        when(roleRepository.findRoleByIdAndStatus(roleId, "ACTIVE")).thenReturn(existingRole);
+        when(roleRepository.findRoleByIdAndStatus(roleId, GeneralStatus.ACTIVE.getValue())).thenReturn(existingRole);
         when(roleRepository.existsRoleByName("new-admin")).thenReturn(false);
 
         roleService.updateRole(request, roleId);
