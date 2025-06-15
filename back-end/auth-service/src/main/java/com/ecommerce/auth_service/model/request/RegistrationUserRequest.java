@@ -1,5 +1,6 @@
 package com.ecommerce.auth_service.model.request;
 
+import com.ecommerce.auth_service.validator.PasswordValidator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
@@ -13,27 +14,30 @@ import javax.validation.constraints.Size;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class RegistrationUserRequest {
     @Email
-    @NotBlank(message = "email is required")
+    @NotBlank(message = "Email is required")
     private String email;
-    @NotBlank(message = "password is required")
+
+    @NotBlank(message = "Password is required")
+    @PasswordValidator
     private String password;
-    @NotBlank(message = "password is required")
+
+    @NotBlank(message = "Confirm password is required")
     private String confirmPassword;
-    @Size(max = 50, message = "password must be less than 50 characters")
-    private String phoneNumber;
-    @NotBlank(message = "first name is required")
-    @Size(max = 100, message = "first name must be less than 100 characters")
+
+    @NotBlank(message = "First name is required")
+    @Size(max = 100, message = "First name must be less than 100 characters")
     private String firstName;
-    @Size(max = 100, message = "last name must be less than 100 characters")
+
+    @Size(max = 100, message = "Last name must be less than 100 characters")
     private String lastName;
+
+    @Size(max = 50, message = "Phone number must be less than 50 characters")
+    private String phoneNumber;
+
     private String birthDate;
-    @Size(max = 20, message = "gender must be less than 20 characters")
+
+    @Size(max = 20, message = "Gender must be less than 20 characters")
     private String gender;
-    @Size(max = 100, message = "id number must be less than 100 characters")
-    private String idNumber;
-    @Size(max = 50, message = "id type must be less than 50 characters")
-    private String idType;
 }
