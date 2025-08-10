@@ -2,8 +2,10 @@ package com.ecommerce.auth_service.controller;
 
 import com.ecommerce.auth_service.common.exception.MainException;
 import com.ecommerce.auth_service.entity.Role;
+import com.ecommerce.auth_service.model.request.AssignPermissionRequest;
 import com.ecommerce.auth_service.model.request.SaveRoleRequest;
 import com.ecommerce.auth_service.model.response.BaseResponse;
+import com.ecommerce.auth_service.service.RolePermissionService;
 import com.ecommerce.auth_service.service.RoleService;
 import com.ecommerce.auth_service.service.impl.RoleServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleController {
     private final RoleService roleService;
+    private final RolePermissionService rolePermissionService;
 
     @GetMapping
     public ResponseEntity<BaseResponse> getRoles() {
@@ -48,5 +51,11 @@ public class RoleController {
     public ResponseEntity<BaseResponse> deleteRole(@PathVariable(value = "id") Long id) {
         roleService.deleteRole(id);
         return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Role deleted successfully", null, null));
+    }
+
+    @PostMapping("/assign-permissions")
+    public ResponseEntity<String> assignPermissions(@RequestBody AssignPermissionRequest request) {
+        rolePermissionService.assignPermissions(request.getRoleId(), request.getPermissionIdList());
+        return ResponseEntity.ok("Permissions assigned to role");
     }
 }
