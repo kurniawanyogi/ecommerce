@@ -10,10 +10,22 @@ import com.ecommerce.auth_service.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
+
+    @Override
+    public List<Role> findRoles() {
+        return roleRepository.findAll() ;
+    }
+
+    @Override
+    public Role findRole(Long id) {
+        return getActiveRole(id);
+    }
 
     @Override
     public void saveRole(SaveRoleRequest request) {
@@ -41,7 +53,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void updateRole(SaveRoleRequest request, Long id) {
-        Role existingRole = GetActiveRole(id);
+        Role existingRole = getActiveRole(id);
         if (!existingRole.getName().equalsIgnoreCase(request.getName())) {
             validateName(request.getName());
         }
@@ -58,12 +70,12 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void deleteRole(Long id) {
-        Role existingRole = GetActiveRole(id);
+        Role existingRole = getActiveRole(id);
         existingRole.setStatus(GeneralStatus.INACTIVE.getValue());
         roleRepository.save(existingRole);
     }
 
-    private Role GetActiveRole(Long id) {
+    private Role getActiveRole(Long id) {
         Role existingRole = roleRepository.findRoleByIdAndStatus(id, GeneralStatus.ACTIVE.getValue());
         if (existingRole == null) {
             throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "Role not found");

@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum GeneralError {
-    VALIDATION_ERROR("VALIDATION_ERROR");
+    VALIDATION_ERROR("VALIDATION_ERROR"),
+    NOT_FOUND("NOT_FOUND");
 
     private final String code;
     GeneralError(String code) {
