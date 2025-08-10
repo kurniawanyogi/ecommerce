@@ -1,6 +1,7 @@
 package com.ecommerce.auth_service.controller;
 
 import com.ecommerce.auth_service.common.exception.MainException;
+import com.ecommerce.auth_service.entity.Role;
 import com.ecommerce.auth_service.model.request.SaveRoleRequest;
 import com.ecommerce.auth_service.model.response.BaseResponse;
 import com.ecommerce.auth_service.service.RoleService;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/roles")
@@ -18,10 +20,22 @@ import javax.validation.Valid;
 public class RoleController {
     private final RoleService roleService;
 
+    @GetMapping
+    public ResponseEntity<BaseResponse> getRoles() {
+        List<Role> roles = roleService.findRoles();
+        return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Roles data", roles, null));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponse> getRoles(@RequestParam("id") Long id) {
+        Role role = roleService.findRole(id);
+        return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Role data", role, null));
+    }
+
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<BaseResponse> saveRole(@Valid @RequestBody SaveRoleRequest request) {
             roleService.saveRole(request);
-            return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Role saved successfully", null, null));
+            return ResponseEntity.ok(new BaseResponse(HttpStatus.CREATED.toString(), "Role saved successfully", null, null));
     }
 
     @PostMapping(value = "/{id}", consumes = "application/json", produces = "application/json")

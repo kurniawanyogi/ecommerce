@@ -1,5 +1,6 @@
 package com.ecommerce.auth_service.service;
 
+import com.ecommerce.auth_service.common.constant.GeneralError;
 import com.ecommerce.auth_service.common.constant.GeneralStatus;
 import com.ecommerce.auth_service.common.exception.MainException;
 import com.ecommerce.auth_service.entity.Role;
@@ -12,8 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,6 +26,60 @@ public class RoleServiceImplTest {
     private RoleRepository roleRepository;
     @InjectMocks
     private RoleServiceImpl roleService;
+
+    @Test
+    public void shouldFindRoles_whenDataNotEmpty() {
+        List<Role> roles = new ArrayList<>();
+        Role role = Role.builder()
+                .id(1L)
+                .name("Admin")
+                .description("admin role")
+                .build();
+        roles.add(role);
+        when(roleRepository.findAll()).thenReturn(roles);
+        List<Role> result = roleService.findRoles();
+
+        assertNotNull(result);
+        verify(roleRepository, times(1)).findAll();
+    }
+
+    @Test
+    void shouldReturnRole_whenRoleExists() {
+        Long roleId = 1L;
+        Role role = Role.builder()
+                .id(roleId)
+                .name("Admin")
+                .description("admin role")
+                .build();
+
+        when(roleRepository.findRoleByIdAndStatus(roleId, GeneralStatus.ACTIVE.getValue()))
+                .thenReturn(role);
+
+        Role result = roleService.findRole(roleId);
+
+        assertNotNull(result);
+        assertEquals(roleId, result.getId());
+        assertEquals("Admin", result.getName());
+
+        verify(roleRepository, times(1)).findRoleByIdAndStatus(roleId, GeneralStatus.ACTIVE.getValue());
+    }
+
+    @Test
+    void shouldThrowMainException_whenRoleNotFound() {
+        Long roleId = 99L;
+
+        when(roleRepository.findRoleByIdAndStatus(roleId, GeneralStatus.ACTIVE.getValue()))
+                .thenReturn(null);
+
+        MainException exception = assertThrows(MainException.class, () -> {
+            roleService.findRole(roleId);
+        });
+
+        assertEquals(GeneralError.VALIDATION_ERROR.getCode(), exception.getCode());
+        assertEquals("Role not found", exception.getMessage());
+
+        verify(roleRepository, times(1)).findRoleByIdAndStatus(roleId, GeneralStatus.ACTIVE.getValue());
+    }
 
     @Test
     void shouldSaveRole_whenRequestIsValid() {
@@ -40,6 +98,7 @@ public class RoleServiceImplTest {
                         role.getDescription().equals("admin role") &&
                         role.getStatus().equals(GeneralStatus.ACTIVE.getValue())
         ));
+        verify(roleRepository, times(1)).save(any(Role.class));
     }
 
     @Test
@@ -83,6 +142,7 @@ public class RoleServiceImplTest {
         verify(roleRepository).save(argThat(role ->
                 role.getName().equals("new-admin") &&
                         role.getDescription().equals("updated desc")));
+        verify(roleRepository, times(1)).save(any(Role.class));
     }
 
     @Test
@@ -109,6 +169,7 @@ public class RoleServiceImplTest {
                 role.getName().equals("admin") &&
                         role.getDescription().equals("desc updated")
         ));
+        verify(roleRepository, times(1)).save(any(Role.class));
     }
 
     @Test
