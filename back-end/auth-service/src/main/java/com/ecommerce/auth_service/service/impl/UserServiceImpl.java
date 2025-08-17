@@ -1,72 +1,123 @@
 package com.ecommerce.auth_service.service.impl;
 
+import com.ecommerce.auth_service.common.constant.GeneralError;
+import com.ecommerce.auth_service.common.constant.GeneralStatus;
 import com.ecommerce.auth_service.common.constant.RoleEnum;
+import com.ecommerce.auth_service.common.constant.VerificationCodeType;
+import com.ecommerce.auth_service.common.exception.MainException;
 import com.ecommerce.auth_service.entity.Role;
+import com.ecommerce.auth_service.entity.VerificationCode;
 import com.ecommerce.auth_service.model.request.AdminRegistrationRequest;
 import com.ecommerce.auth_service.model.request.RegistrationUserRequest;
 import com.ecommerce.auth_service.model.request.SellerRegistrationRequest;
 import com.ecommerce.auth_service.entity.User;
 import com.ecommerce.auth_service.repository.UserRepository;
+import com.ecommerce.auth_service.repository.VerificationCodeRepository;
+import com.ecommerce.auth_service.service.RoleService;
 import com.ecommerce.auth_service.service.UserRoleService;
 import com.ecommerce.auth_service.service.UserService;
+import com.ecommerce.auth_service.service.VerificationCodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import sun.applet.Main;
+
+import javax.transaction.Transactional;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final RoleServiceImpl roleService;
+    private final VerificationCodeService verificationCodeService;
+    private final RoleService roleService;
     private final UserRoleService userRoleService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final VerificationCodeRepository verificationCodeRepository;
 
+    @Override
+    @Transactional
+    public void register(RegistrationUserRequest request) {
+        validateUniqueEmail(request.getEmail());
+        validateUniquePhone(request.getPhoneNumber());
 
-    public void registerSeller(SellerRegistrationRequest request) {
-        validatePasswordMatch(request);
-        User user = mapToUser(request);
-        user = userRepository.save(user);
+        User user = buildUserFromRequest(request);
+        userRepository.save(user);
 
-        Role sellerRole = roleService.findRoleByName(RoleEnum.SELLER.name());
-        if (sellerRole != null) {
-            userRoleService.saveUserRole(user, sellerRole);
+        assignDefaultUserRole(user);
+
+        String code = verificationCodeService.generateCode(VerificationCodeType.REGISTRATION);
+
+        // TODO: Send Notification to user
+    }
+
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new MainException(
+                        GeneralError.NOT_FOUND.getCode(),
+                        "user not found"
+                ));
+    }
+
+    private void validateUniqueEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "email already registered");
         }
     }
 
-    public void registerAdmin(AdminRegistrationRequest request) {
-        validatePasswordMatch(request);
-        User user = mapToUser(request);
-        user = userRepository.save(user);
-
-        Role adminRole = roleService.findRoleByName(RoleEnum.ADMIN.name());
-        if (adminRole != null) {
-            userRoleService.saveUserRole(user, adminRole);
+    private void validateUniquePhone(String phoneNumber) {
+        if (phoneNumber != null && !phoneNumber.isEmpty()) {
+            if (userRepository.existsByPhoneNumber(phoneNumber)) {
+                throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "phone number already registered");
+            }
         }
     }
 
-    private void validatePasswordMatch(RegistrationUserRequest request) {
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("Password and confirm password do not match");
-        }
-    }
-
-    private User mapToUser(RegistrationUserRequest request) {
+    private User buildUserFromRequest(RegistrationUserRequest request) {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setPhoneNumber(request.getPhoneNumber());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
-        if (request.getBirthDate() != null) {
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-                user.setBirthDate(formatter.parse(request.getBirthDate()));
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Invalid date format. Please use dd-MM-yyyy format");
-            }
-        }
         user.setGender(request.getGender());
+        user.setStatus(GeneralStatus.PENDING.getValue());
+
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isEmpty()) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        if (request.getBirthDate() != null && !request.getBirthDate().isEmpty()) {
+            user.setBirthDate(parseBirthDate(request.getBirthDate()));
+        }
+
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
         return user;
+    }
+
+    private Date parseBirthDate(String birthDateStr) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            dateFormat.setLenient(false);
+            return dateFormat.parse(birthDateStr);
+        } catch (ParseException e) {
+            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "Invalid birth date format, expected yyyy-MM-dd");
+        }
+    }
+
+    private void assignDefaultUserRole(User user) {
+        Role userRole = roleService.findRoleByName(RoleEnum.USER.name());
+        if (userRole == null) {
+            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "Default role 'USER' is not configured in the system");
+        }
+        userRoleService.saveUserRole(user, userRole);
     }
 }

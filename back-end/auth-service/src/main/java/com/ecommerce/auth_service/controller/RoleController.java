@@ -1,13 +1,11 @@
 package com.ecommerce.auth_service.controller;
 
-import com.ecommerce.auth_service.common.exception.MainException;
 import com.ecommerce.auth_service.entity.Role;
 import com.ecommerce.auth_service.model.request.AssignPermissionRequest;
 import com.ecommerce.auth_service.model.request.SaveRoleRequest;
 import com.ecommerce.auth_service.model.response.BaseResponse;
 import com.ecommerce.auth_service.service.RolePermissionService;
 import com.ecommerce.auth_service.service.RoleService;
-import com.ecommerce.auth_service.service.impl.RoleServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
