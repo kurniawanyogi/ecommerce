@@ -8,7 +8,8 @@ public enum GeneralError {
     NOT_FOUND("NOT_FOUND"),
     INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR"),
     UNAUTHORIZED("UNAUTHORIZED"),
-    UNAUTHENTICATED("UNAUTHENTICATED"),;
+    UNAUTHENTICATED("UNAUTHENTICATED"),
+    FORBIDDEN("FORBIDDEN"),;
 
     private final String code;
     GeneralError(String code) {
