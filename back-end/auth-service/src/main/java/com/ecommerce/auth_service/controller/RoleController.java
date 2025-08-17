@@ -4,6 +4,7 @@ import com.ecommerce.auth_service.entity.Role;
 import com.ecommerce.auth_service.model.request.AssignPermissionRequest;
 import com.ecommerce.auth_service.model.request.SaveRoleRequest;
 import com.ecommerce.auth_service.model.response.BaseResponse;
+import com.ecommerce.auth_service.security.RequiredPermission;
 import com.ecommerce.auth_service.service.RolePermissionService;
 import com.ecommerce.auth_service.service.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class RoleController {
     private final RolePermissionService rolePermissionService;
 
     @GetMapping
+    @RequiredPermission("role:read")
     public ResponseEntity<BaseResponse> getRoles() {
         List<Role> roles = roleService.findRoles();
         return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Roles data", roles, null));
