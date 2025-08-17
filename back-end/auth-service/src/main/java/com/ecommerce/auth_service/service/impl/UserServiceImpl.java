@@ -27,6 +27,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -38,7 +39,6 @@ public class UserServiceImpl implements UserService {
     private final RoleService roleService;
     private final UserRoleService userRoleService;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final VerificationCodeRepository verificationCodeRepository;
 
     @Override
     @Transactional
@@ -47,13 +47,28 @@ public class UserServiceImpl implements UserService {
         validateUniquePhone(request.getPhoneNumber());
 
         User user = buildUserFromRequest(request);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         assignDefaultUserRole(user);
 
-        String code = verificationCodeService.generateCode(VerificationCodeType.REGISTRATION);
+        String code = verificationCodeService.generateCode(VerificationCodeType.REGISTRATION, savedUser.getId());
 
         // TODO: Send Notification to user
+    }
+
+    @Override
+    public void confirmVerification(VerificationCode verificationCode) {
+        VerificationCode verifiedCode = verificationCodeService.verifyCode(verificationCode.getCode(), verificationCode.getType());
+        if (verifiedCode == null) {
+            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "invalid code or the code has already expired");
+        }
+        User existingUser = userRepository.findById(verifiedCode.getUserId()).orElse(null);
+        if (existingUser == null) {
+            throw new MainException(GeneralError.INTERNAL_SERVER_ERROR.getCode(), "user not found");
+        }
+        existingUser.setStatus(GeneralStatus.ACTIVE.getValue());
+        existingUser.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        userRepository.save(existingUser);
     }
 
     @Override
@@ -114,7 +129,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void assignDefaultUserRole(User user) {
-        Role userRole = roleService.findRoleByName(RoleEnum.USER.name());
+        Role userRole = roleService.findRoleByName(RoleEnum.USER.getName());
         if (userRole == null) {
             throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "Default role 'USER' is not configured in the system");
         }

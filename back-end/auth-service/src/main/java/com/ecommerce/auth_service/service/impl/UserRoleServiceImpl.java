@@ -43,4 +43,12 @@ public class UserRoleServiceImpl implements UserRoleService {
     public void deleteUserRole(UserRole userRole) {
         userRoleRepository.delete(userRole);
     }
+
+    @Override
+    public List<Role> findRolesByUserId(long userId) {
+        List<UserRole> userRoles = userRoleRepository.findByUserId(userId);
+        return userRoles.stream()
+                .map(UserRole::getRole)
+                .collect(Collectors.toList());
+    }
 }

@@ -17,7 +17,6 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
 
-    //TODO testing endpoints
     @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<BaseResponse> registerUser(@Valid @RequestBody RegistrationUserRequest request) {
         userService.register(request);

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +37,14 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 
         removeUnassignedPermissions(roleId, existingIds, requestedIds);
         addNewPermissions(role, existingIds, requestedIds);
+    }
+
+    @Override
+    public List<Permission> findPermissionsByRoleIds(List<Long> roleIds) {
+        List<RolePermission> rolePermissions = rolePermissionRepository.findByRole_IdIn(roleIds);
+        return rolePermissions.stream()
+                .map(RolePermission::getPermission)
+                .collect(Collectors.toList());
     }
 
     private Role getActiveRole(Long id) {

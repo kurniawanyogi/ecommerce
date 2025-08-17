@@ -41,7 +41,8 @@ spring:
      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
      properties:
        spring.json.trusted.packages: "*"
-
+jwt:
+  secret: vN8zTjN7B+xR6YpF9jDc1VmLc3T7yZ0sNqQwEv1W9s4=
 management:
   endpoints:
     web:
