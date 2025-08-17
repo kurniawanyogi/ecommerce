@@ -18,4 +18,6 @@ public interface UserRoleService {
     Optional<UserRole> findById(UserRoleId id);
 
     void deleteUserRole(UserRole userRole);
+
+    List<Role> findRolesByUserId(long userId);
 }

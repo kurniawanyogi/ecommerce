@@ -39,28 +39,34 @@ public class User {
     private String lastName;
 
     @Column(name = "birth_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date birthDate;
 
     @Column(name = "gender")
     private String gender;
 
+    @JsonIgnore
     @Column(name = "id_number")
     private String idNumber;
 
+    @JsonIgnore
     @Column(name = "id_type")
     private String idType;
 
     @Column(name = "status")
     private String status;
 
+    @JsonIgnore
     @Column(name = "created_at")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp createdAt;
 
+    @JsonIgnore
     @Column(name = "updated_at")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp updatedAt;
 
+    @JsonIgnore
     @Column(name = "updated_by")
     private Long updatedBy;
 

@@ -20,7 +20,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     private final long EXPIRED_IN_MINUTES = 60 * 1000;
 
     @Override
-    public String generateCode(VerificationCodeType type) {
+    public String generateCode(VerificationCodeType type, long userId) {
         int maxRetries = 5;
         int attempt = 0;
         String code;
@@ -38,6 +38,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         VerificationCode verificationCode = new VerificationCode();
         verificationCode.setCode(code);
         verificationCode.setType(type);
+        verificationCode.setUserId(userId);
         verificationCode.setExpiresAt(expiresAt);
         verificationCode.setCreatedAt(now);
         verificationCode.setUpdatedAt(now);
@@ -48,17 +49,17 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     }
 
     @Override
-    public boolean verifyCode(String code, VerificationCodeType type) {
+    public VerificationCode verifyCode(String code, VerificationCodeType type) {
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
         VerificationCode verificationCode = verificationCodeRepository
                 .findByCodeAndTypeAndVerifiedFalse(code, type);
 
         if (verificationCode == null) {
-            return false;
+            return null;
         }
         if (verificationCode.getExpiresAt().before(now)) {
-            return false;
+            return null;
         }
 
         verificationCode.setVerified(true);
@@ -66,6 +67,6 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
 
         verificationCodeRepository.save(verificationCode);
 
-        return true;
+        return verificationCode;
     }
 }

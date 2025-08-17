@@ -32,7 +32,7 @@ public class VerificationCodeServiceImplTest {
         when(verificationCodeRepository.existsByTypeAndCodeAndVerifiedFalse(eq(type), anyString()))
                 .thenReturn(false);
 
-        String code = verificationCodeService.generateCode(type);
+        String code = verificationCodeService.generateCode(type, 1);
 
         assertNotNull(code);
         assertEquals(6, code.length());
@@ -47,7 +47,7 @@ public class VerificationCodeServiceImplTest {
         when(verificationCodeRepository.existsByTypeAndCodeAndVerifiedFalse(eq(type), anyString()))
                 .thenReturn(true);
 
-        MainException ex = assertThrows(MainException.class, () -> verificationCodeService.generateCode(type));
+        MainException ex = assertThrows(MainException.class, () -> verificationCodeService.generateCode(type, 1));
 
         assertTrue(ex.getMessage().contains("Failed to generate unique code"));
         verify(verificationCodeRepository, atLeast(5)).existsByTypeAndCodeAndVerifiedFalse(eq(type), anyString());
@@ -70,9 +70,9 @@ public class VerificationCodeServiceImplTest {
         when(verificationCodeRepository.findByCodeAndTypeAndVerifiedFalse(code, type))
                 .thenReturn(verificationCode);
 
-        boolean result = verificationCodeService.verifyCode(code, type);
+        VerificationCode result = verificationCodeService.verifyCode(code, type);
 
-        assertTrue(result);
+        assertNotNull(result);
         assertTrue(verificationCode.isVerified());
         verify(verificationCodeRepository, times(1)).findByCodeAndTypeAndVerifiedFalse(code, type);
         verify(verificationCodeRepository, times(1)).save(verificationCode);
@@ -86,9 +86,9 @@ public class VerificationCodeServiceImplTest {
         when(verificationCodeRepository.findByCodeAndTypeAndVerifiedFalse(code, type))
                 .thenReturn(null);
 
-        boolean result = verificationCodeService.verifyCode(code, type);
+        VerificationCode result = verificationCodeService.verifyCode(code, type);
 
-        assertFalse(result);
+        assertNull(result);
         verify(verificationCodeRepository, times(1)).findByCodeAndTypeAndVerifiedFalse(code, type);
         verify(verificationCodeRepository, never()).save(any());
     }
@@ -110,9 +110,9 @@ public class VerificationCodeServiceImplTest {
         when(verificationCodeRepository.findByCodeAndTypeAndVerifiedFalse(code, type))
                 .thenReturn(verificationCode);
 
-        boolean result = verificationCodeService.verifyCode(code, type);
+        VerificationCode result = verificationCodeService.verifyCode(code, type);
 
-        assertFalse(result);
+        assertNull(result);
         verify(verificationCodeRepository, times(1)).findByCodeAndTypeAndVerifiedFalse(code, type);
         verify(verificationCodeRepository, never()).save(any());
     }

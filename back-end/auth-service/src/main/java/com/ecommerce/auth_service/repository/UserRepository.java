@@ -10,6 +10,6 @@ import javax.validation.constraints.Size;
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
-    User findByEmail(String email);
+    User findByEmailAndStatus(String email, String status);
     User findByPhoneNumber(String phoneNumber);
 }
