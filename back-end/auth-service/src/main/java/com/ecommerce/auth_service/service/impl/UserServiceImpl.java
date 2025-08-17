@@ -13,6 +13,7 @@ import com.ecommerce.auth_service.model.request.SellerRegistrationRequest;
 import com.ecommerce.auth_service.entity.User;
 import com.ecommerce.auth_service.repository.UserRepository;
 import com.ecommerce.auth_service.repository.VerificationCodeRepository;
+import com.ecommerce.auth_service.security.AuthUtil;
 import com.ecommerce.auth_service.service.RoleService;
 import com.ecommerce.auth_service.service.UserRoleService;
 import com.ecommerce.auth_service.service.UserService;
@@ -28,8 +29,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -78,6 +78,31 @@ public class UserServiceImpl implements UserService {
                         GeneralError.NOT_FOUND.getCode(),
                         "user not found"
                 ));
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll() ;
+    }
+
+    @Override
+    public void deactivate(Long id) {
+        Long currentUserId = AuthUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            throw new MainException(GeneralError.UNAUTHORIZED.getCode(), "User is not authenticated");
+        }
+
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            throw new MainException(GeneralError.NOT_FOUND.getCode(), "user not found");
+        }
+        if (user.getStatus().equals(GeneralStatus.INACTIVE.getValue())) {
+            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "inactive user");
+        }
+        user.setStatus(GeneralStatus.INACTIVE.getValue());
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedBy(currentUserId);
+        userRepository.save(user);
     }
 
     private void validateUniqueEmail(String email) {
