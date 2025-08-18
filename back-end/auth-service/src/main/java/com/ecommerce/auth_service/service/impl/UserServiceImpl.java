@@ -11,6 +11,7 @@ import com.ecommerce.auth_service.model.request.AdminRegistrationRequest;
 import com.ecommerce.auth_service.model.request.RegistrationUserRequest;
 import com.ecommerce.auth_service.model.request.SellerRegistrationRequest;
 import com.ecommerce.auth_service.entity.User;
+import com.ecommerce.auth_service.model.request.UpdateUserRequest;
 import com.ecommerce.auth_service.repository.UserRepository;
 import com.ecommerce.auth_service.repository.VerificationCodeRepository;
 import com.ecommerce.auth_service.security.AuthUtil;
@@ -19,6 +20,9 @@ import com.ecommerce.auth_service.service.UserRoleService;
 import com.ecommerce.auth_service.service.UserService;
 import com.ecommerce.auth_service.service.VerificationCodeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import sun.applet.Main;
@@ -30,6 +34,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -62,44 +67,97 @@ public class UserServiceImpl implements UserService {
         if (verifiedCode == null) {
             throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "invalid code or the code has already expired");
         }
-        User existingUser = userRepository.findById(verifiedCode.getUserId()).orElse(null);
-        if (existingUser == null) {
-            throw new MainException(GeneralError.INTERNAL_SERVER_ERROR.getCode(), "user not found");
-        }
-        existingUser.setStatus(GeneralStatus.ACTIVE.getValue());
-        existingUser.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        userRepository.save(existingUser);
+        User existingUser = getUserOrThrow(verifiedCode.getUserId());
+
+        updateUserStatus(existingUser, GeneralStatus.ACTIVE.getValue(), null);
     }
 
     @Override
     public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new MainException(
-                        GeneralError.NOT_FOUND.getCode(),
-                        "user not found"
-                ));
+        return getUserOrThrow(id);
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll() ;
+    public Page<User> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAll(pageable);
     }
 
     @Override
     public void deactivate(Long id) {
+        Long currentUserId = getCurrentUserIdOrThrow();
+        User user = getUserOrThrow(id);
+        if (user.getStatus().equals(GeneralStatus.INACTIVE.getValue())) {
+            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "inactive user");
+        }
+        updateUserStatus(user, GeneralStatus.INACTIVE.getValue(), currentUserId);
+    }
+
+    @Override
+    @Transactional
+    public void requestUserReactivation(Long id) {
+        Long currentUserId = getCurrentUserIdOrThrow();
+
+        User user = getUserOrThrow(id);
+
+        if (GeneralStatus.ACTIVE.getValue().equals(user.getStatus())) {
+            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "User is in ACTIVE status");
+        }
+
+        updateUserStatus(user, GeneralStatus.PENDING.getValue(), currentUserId);
+        String code = verificationCodeService.generateCode(VerificationCodeType.REGISTRATION, user.getId());
+
+        // TODO: Send Notification to user
+    }
+
+    @Override
+    public void updateUser(Long id, UpdateUserRequest request) {
+        Long currentUserId = getCurrentUserIdOrThrow();
+
+        User user = getUserOrThrow(id);
+        if (GeneralStatus.INACTIVE.getValue().equals(user.getStatus())) {
+            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "inactive user");
+        }
+        applyUpdateRequestToUser(user, request);
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        user.setUpdatedBy(currentUserId);
+        userRepository.save(user);
+    }
+
+    private void applyUpdateRequestToUser(User user, UpdateUserRequest request) {
+        updateIfPresent(request.getFirstName(), user::setFirstName);
+        updateIfPresent(request.getLastName(), user::setLastName);
+        updateIfPresent(request.getPhoneNumber(), user::setPhoneNumber);
+        updateIfPresent(request.getGender(), user::setGender);
+        updateIfPresent(request.getIdNumber(), user::setIdNumber);
+        updateIfPresent(request.getIdType(), user::setIdType);
+
+        if (request.getBirthDate() != null) {
+            user.setBirthDate(parseBirthDate(request.getBirthDate()));
+        }
+    }
+
+    private <T> void updateIfPresent(T value, Consumer<T> setter) {
+        if (value != null) {
+            setter.accept(value);
+        }
+    }
+
+    private static Long getCurrentUserIdOrThrow() {
         Long currentUserId = AuthUtil.getCurrentUserId();
         if (currentUserId == null) {
             throw new MainException(GeneralError.UNAUTHORIZED.getCode(), "User is not authenticated");
         }
+        return currentUserId;
+    }
 
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            throw new MainException(GeneralError.NOT_FOUND.getCode(), "user not found");
-        }
-        if (user.getStatus().equals(GeneralStatus.INACTIVE.getValue())) {
-            throw new MainException(GeneralError.VALIDATION_ERROR.getCode(), "inactive user");
-        }
-        user.setStatus(GeneralStatus.INACTIVE.getValue());
+    private User getUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new MainException(GeneralError.NOT_FOUND.getCode(), "user not found"));
+    }
+
+    private void updateUserStatus(User user, String newStatus, Long currentUserId) {
+        user.setStatus(newStatus);
         user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
         user.setUpdatedBy(currentUserId);
         userRepository.save(user);
