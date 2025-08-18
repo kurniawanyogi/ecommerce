@@ -20,4 +20,13 @@ public class BaseResponse {
     private Object data;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object errors;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Object pagination;
+
+    public BaseResponse(String code, String message, Object data, Object errors) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+        this.errors = errors;
+    }
 }

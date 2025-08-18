@@ -8,7 +8,9 @@ import com.ecommerce.auth_service.common.exception.MainException;
 import com.ecommerce.auth_service.entity.Role;
 import com.ecommerce.auth_service.entity.User;
 import com.ecommerce.auth_service.model.request.RegistrationUserRequest;
+import com.ecommerce.auth_service.model.request.UpdateUserRequest;
 import com.ecommerce.auth_service.repository.UserRepository;
+import com.ecommerce.auth_service.security.AuthUtil;
 import com.ecommerce.auth_service.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -181,5 +184,123 @@ class UserServiceImplTest {
         assertEquals(GeneralError.NOT_FOUND.getCode(), exception.getCode());
         assertEquals("user not found", exception.getMessage());
         verify(userRepository, times(1)).findById(userId);
+    }
+
+    @Test
+    void deactivate_whenUserIsAlreadyInactive_shouldThrowException() {
+        validUser.setStatus(GeneralStatus.INACTIVE.getValue());
+        when(userRepository.findById(validUser.getId())).thenReturn(Optional.of(validUser));
+
+        try (MockedStatic<AuthUtil> mockedAuthUtil = mockStatic(AuthUtil.class)) {
+            mockedAuthUtil.when(AuthUtil::getCurrentUserId).thenReturn(99L);
+
+            MainException exception = assertThrows(MainException.class, () -> {
+                userService.deactivate(validUser.getId());
+            });
+            assertEquals(GeneralError.VALIDATION_ERROR.getCode(), exception.getCode());
+            assertEquals("inactive user", exception.getMessage());
+        }
+        verify(userRepository, times(1)).findById(validUser.getId());
+    }
+
+    @Test
+    void deactivate_whenUserIsActive_shouldDeactivateSuccessfully() {
+        validUser.setStatus(GeneralStatus.ACTIVE.getValue());
+        when(userRepository.findById(validUser.getId())).thenReturn(Optional.of(validUser));
+
+        try (MockedStatic<AuthUtil> mockedAuthUtil = mockStatic(AuthUtil.class)) {
+            Long currentUserId = 99L;
+            mockedAuthUtil.when(AuthUtil::getCurrentUserId).thenReturn(currentUserId);
+
+            userService.deactivate(validUser.getId());
+
+            assertEquals(GeneralStatus.INACTIVE.getValue(), validUser.getStatus());
+            assertEquals(currentUserId, validUser.getUpdatedBy());
+            assertNotNull(validUser.getUpdatedAt());
+            verify(userRepository, times(1)).save(validUser);
+        }
+        verify(userRepository, times(1)).findById(validUser.getId());
+    }
+
+    @Test
+    void requestReactivation_whenUserIsActive_shouldThrowException() {
+        validUser.setStatus(GeneralStatus.ACTIVE.getValue());
+        when(userRepository.findById(validUser.getId())).thenReturn(Optional.of(validUser));
+
+        try (MockedStatic<AuthUtil> mockedAuthUtil = mockStatic(AuthUtil.class)) {
+            mockedAuthUtil.when(AuthUtil::getCurrentUserId).thenReturn(99L);
+
+            MainException exception = assertThrows(MainException.class, () -> {
+                userService.requestUserReactivation(validUser.getId());
+            });
+            assertEquals(GeneralError.VALIDATION_ERROR.getCode(), exception.getCode());
+            assertEquals("User is in ACTIVE status", exception.getMessage());
+        }
+        verify(userRepository, times(1)).findById(validUser.getId());
+    }
+
+    @Test
+    void requestReactivation_whenUserIsInactive_shouldChangeStatusSuccessfully() {
+        validUser.setStatus(GeneralStatus.INACTIVE.getValue());
+        when(userRepository.findById(validUser.getId())).thenReturn(Optional.of(validUser));
+
+        try (MockedStatic<AuthUtil> mockedAuthUtil = mockStatic(AuthUtil.class)) {
+            Long currentUserId = 99L;
+            mockedAuthUtil.when(AuthUtil::getCurrentUserId).thenReturn(currentUserId);
+            userService.requestUserReactivation(validUser.getId());
+
+            assertEquals(GeneralStatus.PENDING.getValue(), validUser.getStatus());
+            assertEquals(currentUserId, validUser.getUpdatedBy());
+            assertNotNull(validUser.getUpdatedAt());
+            verify(userRepository, times(1)).save(validUser);
+        }
+        verify(userRepository, times(1)).findById(validUser.getId());
+    }
+
+
+    @Test
+    void updateUser_whenUserIsInactive_shouldThrowException() {
+       validUser.setStatus(GeneralStatus.INACTIVE.getValue());
+        UpdateUserRequest updateRequest = new UpdateUserRequest();
+        updateRequest.setFirstName("Updated");
+        when(userRepository.findById(validUser.getId())).thenReturn(Optional.of(validUser));
+
+        try (MockedStatic<AuthUtil> mockedAuthUtil = mockStatic(AuthUtil.class)) {
+            mockedAuthUtil.when(AuthUtil::getCurrentUserId).thenReturn(99L);
+
+            MainException exception = assertThrows(MainException.class, () -> {
+                userService.updateUser(validUser.getId(), updateRequest);
+            });
+
+            assertEquals(GeneralError.VALIDATION_ERROR.getCode(), exception.getCode());
+            assertEquals("inactive user", exception.getMessage());
+        }
+        verify(userRepository, times(1)).findById(validUser.getId());
+    }
+
+    @Test
+    void updateUser_shouldUpdateFieldsSuccessfully() {
+        Long updaterId = 77L;
+
+        validUser.setStatus(GeneralStatus.ACTIVE.getValue());
+
+        UpdateUserRequest updateRequest = new UpdateUserRequest();
+        updateRequest.setFirstName("NewName");
+        updateRequest.setLastName("LastName");
+        updateRequest.setGender("Male");
+
+        when(userRepository.findById(validUser.getId())).thenReturn(Optional.of(validUser));
+
+        try (MockedStatic<AuthUtil> mockedAuthUtil = mockStatic(AuthUtil.class)) {
+            mockedAuthUtil.when(AuthUtil::getCurrentUserId).thenReturn(updaterId);
+            userService.updateUser(validUser.getId(), updateRequest);
+        }
+
+        assertEquals("NewName", validUser.getFirstName());
+        assertEquals("LastName", validUser.getLastName());
+        assertEquals("Male", validUser.getGender());
+        assertEquals(updaterId, validUser.getUpdatedBy());
+        assertNotNull(validUser.getUpdatedAt());
+        verify(userRepository, times(1)).save(validUser);
     }
 }
