@@ -29,33 +29,38 @@ public class RoleController {
         return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Roles data", roles, null));
     }
 
+    @RequiredPermission("role:read")
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getRoles(@RequestParam("id") Long id) {
         Role role = roleService.findRole(id);
         return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Role data", role, null));
     }
 
+    @RequiredPermission("role:write")
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<BaseResponse> saveRole(@Valid @RequestBody SaveRoleRequest request) {
             roleService.saveRole(request);
             return ResponseEntity.ok(new BaseResponse(HttpStatus.CREATED.toString(), "Role saved successfully", null, null));
     }
 
+    @RequiredPermission("role:write")
     @PostMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<BaseResponse> updateRole(@Valid @RequestBody SaveRoleRequest request, @PathVariable(value = "id") Long id) {
         roleService.updateRole(request, id);
         return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Role updated successfully", null, null));
     }
 
+    @RequiredPermission("role:delete")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<BaseResponse> deleteRole(@PathVariable(value = "id") Long id) {
         roleService.deleteRole(id);
         return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Role deleted successfully", null, null));
     }
 
+    @RequiredPermission("role:assign-permission")
     @PostMapping("/assign-permissions")
-    public ResponseEntity<String> assignPermissions(@RequestBody AssignPermissionRequest request) {
+    public ResponseEntity<BaseResponse> assignPermissions(@RequestBody AssignPermissionRequest request) {
         rolePermissionService.assignPermissions(request.getRoleId(), request.getPermissionIdList());
-        return ResponseEntity.ok("Permissions assigned to role");
+        return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.toString(), "Permissions assigned to role", null, null));
     }
 }
