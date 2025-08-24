@@ -5,6 +5,7 @@ import com.ecommerce.auth_service.common.constant.VerificationCodeType;
 import com.ecommerce.auth_service.common.exception.MainException;
 import com.ecommerce.auth_service.entity.VerificationCode;
 import com.ecommerce.auth_service.model.request.LoginRequest;
+import com.ecommerce.auth_service.model.request.RegistrationUserRequest;
 import com.ecommerce.auth_service.model.response.BaseResponse;
 import com.ecommerce.auth_service.model.response.LoginResponse;
 import com.ecommerce.auth_service.service.AuthService;
@@ -22,6 +23,13 @@ import javax.validation.Valid;
 public class AuthController {
     private final UserService userService;
     private final AuthService authService;
+
+    @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<BaseResponse> registerUser(@Valid @RequestBody RegistrationUserRequest request) {
+        userService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new BaseResponse(HttpStatus.CREATED.toString(), "User registered successfully", null, null));
+    }
 
     @GetMapping(value = "/register/confirm")
     public ResponseEntity<BaseResponse> confirmVerification(
