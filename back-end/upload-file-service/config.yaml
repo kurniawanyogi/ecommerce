@@ -1,0 +1,16 @@
+server:
+  host: localhost
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 10s
+  idle_timeout: 60s
+
+worker:
+  concurrency: 10
+  retry_max_attempts: 3
+  retry_delay: 30s
+
+logger:
+  level: info
+  format: json
+  output_path: stdout
