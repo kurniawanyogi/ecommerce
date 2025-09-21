@@ -12,9 +12,10 @@ const (
 )
 
 type Config struct {
-	Server ServerConfig `mapstructure:"api"`
-	Logger LoggerConfig `mapstructure:"logger"`
-	Worker WorkerConfig `mapstructure:"worker"`
+	Server   ServerConfig   `mapstructure:"server"`
+	Logger   LoggerConfig   `mapstructure:"logger"`
+	Worker   WorkerConfig   `mapstructure:"worker"`
+	Supabase SupabaseConfig `mapstructure:"supabase"`
 }
 
 type ServerConfig struct {
@@ -38,17 +39,23 @@ type WorkerConfig struct {
 	RetryDelay           time.Duration `mapstructure:"retry_delay"`
 }
 
+type SupabaseConfig struct {
+	URL        string `mapstructure:"url"`
+	ServiceKey string `mapstructure:"service_key"`
+	Bucket     string `mapstructure:"bucket"`
+}
+
 func NewConfig() (*Config, error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./config")
 
-	viper.SetDefault("api.host", "localhost")
-	viper.SetDefault("api.port", 8882)
-	viper.SetDefault("api.read_timeout", "10s")
-	viper.SetDefault("api.write_timeout", "10s")
-	viper.SetDefault("api.idle_timeout", "60s")
+	viper.SetDefault("server.host", "localhost")
+	viper.SetDefault("server.port", 8882)
+	viper.SetDefault("server.read_timeout", "10s")
+	viper.SetDefault("server.write_timeout", "10s")
+	viper.SetDefault("server.idle_timeout", "60s")
 
 	viper.SetDefault("logger.level", "info")
 	viper.SetDefault("logger.format", "json")
@@ -58,6 +65,10 @@ func NewConfig() (*Config, error) {
 	viper.SetDefault("worker.payment_check_interval", "5m")
 	viper.SetDefault("worker.retry_max_attempts", 3)
 	viper.SetDefault("worker.retry_delay", "30s")
+
+	viper.SetDefault("supabase.url", "")
+	viper.SetDefault("supabase.service_key", "")
+	viper.SetDefault("supabase.bucket", "")
 
 	viper.AutomaticEnv()
 
