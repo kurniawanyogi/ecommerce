@@ -1,10 +1,12 @@
 package api
 
-import "go.uber.org/fx"
+import (
+	"go.uber.org/fx"
+	file_upload "upload-file-service/internal/application/file-upload"
+)
 
 var Module = fx.Options(
-	// TODO Include all domain modules
+	file_upload.Module,
 
-	// API api
 	fx.Provide(NewServer),
 )
